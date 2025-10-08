@@ -4,6 +4,8 @@ import './Skills.css';
 function Skills() {
   const [isVisible, setIsVisible] = useState(false);
   const skillsRef = useRef(null);
+  const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -22,6 +24,124 @@ function Skills() {
     return () => {
       if (skillsRef.current) {
         observer.unobserve(skillsRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let particles = [];
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+
+    const handleMouseMove = (e) => {
+      const rect = skillsRef.current.getBoundingClientRect();
+      mouseRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    };
+
+    class Particle {
+      constructor() {
+        this.reset();
+        this.y = Math.random() * canvas.height;
+        this.opacity = Math.random() * 0.5 + 0.3;
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = -10;
+        this.size = Math.random() * 3 + 1;
+        this.speedY = Math.random() * 0.5 + 0.2;
+        this.speedX = Math.random() * 0.3 - 0.15;
+        this.opacity = Math.random() * 0.5 + 0.3;
+      }
+
+      update() {
+        // Mouse interaction
+        const dx = mouseRef.current.x - this.x;
+        const dy = mouseRef.current.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = 150;
+
+        if (distance < maxDistance) {
+          const force = (maxDistance - distance) / maxDistance;
+          const angle = Math.atan2(dy, dx);
+          this.x -= Math.cos(angle) * force * 2;
+          this.y -= Math.sin(angle) * force * 2;
+        }
+
+        // Normal movement
+        this.y += this.speedY;
+        this.x += this.speedX;
+
+        // Boundary check
+        if (this.y > canvas.height + 10) {
+          this.reset();
+        }
+        if (this.x < -10 || this.x > canvas.width + 10) {
+          this.x = Math.random() * canvas.width;
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(167, 139, 250, ${this.opacity})`;
+        ctx.fill();
+
+        // Glow effect
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size + 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(167, 139, 250, ${this.opacity * 0.2})`;
+        ctx.fill();
+      }
+    }
+
+    const initParticles = () => {
+      particles = [];
+      const particleCount = Math.floor((canvas.width * canvas.height) / 8000);
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    resizeCanvas();
+    initParticles();
+    animate();
+
+    const resizeHandler = () => {
+      resizeCanvas();
+      initParticles();
+    };
+
+    window.addEventListener('resize', resizeHandler);
+    skillsRef.current.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resizeHandler);
+      if (skillsRef.current) {
+        skillsRef.current.removeEventListener('mousemove', handleMouseMove);
       }
     };
   }, []);
@@ -109,11 +229,12 @@ function Skills() {
 
   return (
     <section className={`skills ${isVisible ? 'visible' : ''}`} ref={skillsRef}>
+      <canvas ref={canvasRef} className="dust-canvas"></canvas>
       <div className="skills-container">
         <h2 className="section-title">Technical Skills</h2>
         <div className="divider"></div>
         <p className="skills-subtitle">Technologies I work with</p>
-        
+
         <div className="skills-grid">
           {skillCategories.map((category, idx) => (
             <div key={idx} className="skill-category" style={{ transitionDelay: `${idx * 0.1}s` }}>

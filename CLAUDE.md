@@ -35,9 +35,10 @@ The application follows a single-page layout with modular React components:
 ### Component Architecture Pattern
 Components use a consistent pattern:
 - Each component has its own CSS file for styling
-- Intersection Observer API is used for scroll-based animations (see About.js:9-26)
+- Intersection Observer API is used for scroll-based animations (see About.js:9-28)
 - Parallax effects implemented via scroll event listeners (see Hero.js:7-11)
 - Components become visible/animate when they enter viewport (threshold: 0.2)
+- Canvas-based animated backgrounds for enhanced visual effects (About, Skills, Stats)
 
 ### Styling Approach
 - Component-scoped CSS files (e.g., Hero.css, About.css)
@@ -71,6 +72,35 @@ Components use IntersectionObserver for performance-efficient scroll animations:
 - Observer created with 0.2 threshold (triggers at 20% visibility)
 - CSS class toggling (.visible) drives animation transitions
 - Proper cleanup in useEffect return to prevent memory leaks
+
+### Canvas Background Animations
+Interactive canvas-based backgrounds add visual depth to sections:
+
+**About Section (About.js:30-120)**
+- Connecting dots particle system with dynamic line drawing
+- Particles bounce off edges and connect when within 120px distance
+- Lines fade based on distance for smooth visual effect
+- Particle count scales with screen size (calculated per 15000px²)
+
+**Skills Section (Skills.js:31-147)**
+- Floating dust particles with mouse interaction
+- Particles repel from mouse cursor within 150px radius
+- Purple/violet gradient colors with glow effects
+- Particles slowly drift downward and reset at bottom
+- Mouse events attached to section element for proper interaction
+
+**Stats Section (Stats.js:30-87)**
+- 8-bit Tron Legacy style horizontal scanlines
+- Alternating cyan (rgba(0, 255, 255, 0.15)) and magenta (rgba(255, 0, 255, 0.1)) lines
+- 4px line spacing with smooth downward animation (0.5px per frame)
+- Dark cyberpunk gradient background (#000000 to #1a0033)
+- Neon-themed UI cards with cyan/magenta borders and glow effects
+
+**Performance Considerations:**
+- All canvas animations use requestAnimationFrame for smooth 60fps performance
+- Particle counts dynamically adjust based on viewport size
+- Proper cleanup in useEffect prevents memory leaks
+- Canvas animations optimized to avoid unnecessary rendering operations
 
 ## Project Structure
 ```
