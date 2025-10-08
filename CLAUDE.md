@@ -38,7 +38,7 @@ Components use a consistent pattern:
 - Intersection Observer API is used for scroll-based animations (see About.js:9-28)
 - Parallax effects implemented via scroll event listeners (see Hero.js:7-11)
 - Components become visible/animate when they enter viewport (threshold: 0.2)
-- Canvas-based animated backgrounds for enhanced visual effects (About, Skills, Stats)
+- Canvas-based animated backgrounds for enhanced visual effects (About, Skills, Stats, Documentary)
 
 ### Styling Approach
 - Component-scoped CSS files (e.g., Hero.css, About.css)
@@ -95,6 +95,15 @@ Interactive canvas-based backgrounds add visual depth to sections:
 - 4px line spacing with smooth downward animation (0.5px per frame)
 - Dark cyberpunk gradient background (#000000 to #1a0033)
 - Neon-themed UI cards with cyan/magenta borders and glow effects
+
+**Documentary Section (Documentary.js:30-167)**
+- Film projector light rays emanating from top center (8 beams)
+- Dust particles floating downward, visible only within light beams
+- Warm golden color (rgba(255, 220, 180)) for cinematic atmosphere
+- Animated film grain texture with random white pixels (2% density)
+- Dark theater gradient background (#0a0a15 to #1a1020)
+- Film cards with pink/purple borders and warm golden accents
+- Creates authentic "documentary screening in a theater" ambiance
 
 **Performance Considerations:**
 - All canvas animations use requestAnimationFrame for smooth 60fps performance
